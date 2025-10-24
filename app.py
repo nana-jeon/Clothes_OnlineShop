@@ -1,6 +1,4 @@
-from itertools import product
 from flask import Flask , render_template , request , json, abort
-from products_list import pro_list
 from telegram_bot_function import sendText
 from flask_mail import Mail, Message
 
@@ -14,6 +12,23 @@ app.config['MAIL_PASSWORD'] = 'ulqw zeqw mwtr yaxq'
 app.config['MAIL_DEFAULT_SENDER'] = 'romdoul1997@gmail.com'
 
 mail = Mail(app)
+import Route
+
+@app.errorhandler(403)
+def error_403(error):
+    return render_template('Error_Page/403_error.html')
+
+@app.errorhandler(404)
+def error_404(error):
+    return render_template('Error_Page/404_error.html')
+
+
+@app.errorhandler(500)
+def error_500(error):
+    return render_template('Error_Page/500_error.html')
+
+
+
 
 @app.route('/sendMail')
 def send_email():
@@ -25,58 +40,6 @@ def send_email():
   return 'Email sent succesfully!'
 
 
-@app.route('/')
-def index():  # put application's code here
-    products = pro_list
-    return render_template('home.html' , products=products , modules = home)
-
-@app.get('/add_cart')
-def add_cart():
-    return render_template('add_cart.html' , modules = add_cart)
-
-@app.get('/checkout')
-def checkout():
-    return render_template('check_out.html' , modules = checkout)
-
-@app.get('/product')
-def home():
-    products = pro_list
-    return render_template('product.html' , products=products , modules = product)
-
-@app.get('/about_us')
-def about_us():
-    return render_template('about_us.html' , modules = about_us)
-
-@app.get('/contact_us')
-def contact_us():
-    return render_template('contact_us.html' , modules = contact_us)
-
-@app.route('/check_out')
-def check_out():
-    return render_template('check_out.html')
-
-# @app.get('/product_detail')
-# def product_detail():
-#     products = pro_list
-#     return render_template('product_detail.html' , products=products , modules = product)
-
-
-def get_product_by_id(product_id):
-    # Search through pro_list to find the product with matching ID
-    for product in pro_list:
-        if product['id'] == product_id:
-            return product
-    return None  # Return None if product not found
-
-
-@app.route('/product_detail/<int:product_id>')
-def product_detail(product_id):
-    product = get_product_by_id(product_id)
-
-    if not product:
-        abort(404)  # Return 404 if product not found
-
-    return render_template('product_detail.html', item=product)
 
 
 
@@ -452,7 +415,7 @@ def process_checkout():
         cart_data = []
 
 
-    # token = '8116993901:AAFV2oZ3_MOrEhL_XsqYUjtTIyzOqmqQ0WY'
+    token = '8116993901:AAFV2oZ3_MOrEhL_XsqYUjtTIyzOqmqQ0WY'
     chat_id = '@O_Romdoul'
 
     # Initialize totals
@@ -501,10 +464,9 @@ def process_checkout():
         chat_id=chat_id,
         message=html,
     )
-    # msg = Message('Invoice From Nana Shop', recipients=['sreylis534@gmail.com'])
     msg = Message('Invoice From Nana Shop', recipients=[email])
     msg.body = 'This is a plain text email sent from Flask'
-    # message = render_template('invoice.html')
+    message = render_template('invoice.html')
     msg.html = render_template('invoice.html',
                                customer_name=f"{first_name} {last_name}",
                                customer_email=email,
@@ -512,14 +474,12 @@ def process_checkout():
                                customer_phone=phone,
                                items=cart_data,
                                total=f"${total:.2f}",
-                               # total_khr = f"${formatted_khr}"
+                               total_khr = f"${formatted_khr}"
                                )
     mail.send(msg)
 
-    return "Order placed successfully! "
-
     # return f"{res}"
-
+    return "Email Sent Successfully"
     # return f"{first_name} {last_name}, {email}, {phone}, {address}, {first_item.get('title', 'No items')}"
 
 
@@ -527,4 +487,4 @@ def process_checkout():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
