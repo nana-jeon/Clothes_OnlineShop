@@ -1,10 +1,8 @@
 from flask import render_template
 from products_list import pro_list
-from app import app
-
+from app import app, db  # Import your app, not Flask
 
 @app.route('/')
 def index():
     products = pro_list
     return render_template('home.html', products=products, modules='home')
-
