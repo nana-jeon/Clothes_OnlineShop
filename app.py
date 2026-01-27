@@ -543,19 +543,19 @@ def process_checkout():
     sendText(chat_id='@O_Romdoul', message=html)
 
     # ------------------- SEND EMAIL -------------------
-    msg = Message('Invoice From Nana Shop', recipients=[email])
-    msg.body = 'This is a plain text email sent from Flask'
-    msg.html = render_template(
-        'invoice.html',
-        customer_name=customer.username,
-        customer_email=email,
-        customer_address=address,
-        customer_phone=phone,
-        items=cart_data,
-        total=f"${total:.2f}",
-        total_khr=f"{formatted_khr}"
-    )
-    mail.send(msg)
+    # msg = Message('Invoice From Nana Shop', recipients=[email])
+    # msg.body = 'This is a plain text email sent from Flask'
+    # msg.html = render_template(
+    #     'invoice.html',
+    #     customer_name=customer.username,
+    #     customer_email=email,
+    #     customer_address=address,
+    #     customer_phone=phone,
+    #     items=cart_data,
+    #     total=f"${total:.2f}",
+    #     total_khr=f"{formatted_khr}"
+    # )
+    # mail.send(msg)
 
     return "Checkout successful!"
 
