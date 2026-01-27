@@ -7,17 +7,28 @@ from Route.Front.ProductDetail import *
 from Route.Front.Checkout import *
 
 
-
-
 # admin
-from Route.Admin.branch import *
-from Route.Admin.user import *
-from Route.Admin.category import *
-from Route.Admin.product import *
-from Route.Admin.customer import *
-from Route.Admin.invoice import *
-from Route.Admin.invoice_detail import *
-from Route.Admin.report import *
+from Route.admin.auth import *
+from Route.admin.dashboard import *
+from Route.admin.user import *
+from Route.admin.product import *
+from Route.admin.category import *
+from Route.admin.order import *
+
+
+
+
+
+
+# api
+from Route.api.branch import *
+from Route.api.user import *
+from Route.api.category import *
+from Route.api.product import *
+from Route.api.customer import *
+from Route.api.invoice import *
+from Route.api.invoice_detail import *
+from Route.api.report import *
 
 
 

@@ -1,12 +1,46 @@
-from flask import Flask, render_template, request, json
+from flask import Flask, render_template, request, json, jsonify
 from flask_mail import Mail, Message
 from telegram_bot_function import sendText
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
 from flask_migrate import Migrate
+
+import os
+# from app import app, db
+from flask import request, jsonify
+from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash
+
+
+
+
+
+
+from werkzeug.security import  check_password_hash
+from datetime import timedelta
+from flask_jwt_extended import create_access_token, get_jwt
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
+from flask_jwt_extended import JWTManager
 
 
 # Create Flask app
 app = Flask(__name__)
+
+
+# Setup the Flask-JWT-Extended extension
+app.config["JWT_SECRET_KEY"] = "sjahd487365"
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=30)
+
+
+# Session
+app.config["SECRET_KEY"] = "sjahd487365"
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=24)
+
+
+jwt = JWTManager(app)
+
+
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -15,7 +49,15 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
+
+
+
 import Route
+
+from model.user import User
+
+# Import admin routes
+
 
 # Flask Mail setup
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -26,6 +68,109 @@ app.config['MAIL_PASSWORD'] = 'ulqw zeqw mwtr yaxq'
 app.config['MAIL_DEFAULT_SENDER'] = 'romdoul1997@gmail.com'
 
 mail = Mail(app)
+
+# --- blocklist for revoked JTIs (in-memory demo) ---
+REVOKED_JTIS = set()
+
+@jwt.token_in_blocklist_loader
+def check_if_token_revoked(jwt_header, jwt_data):
+    return jwt_data["jti"] in REVOKED_JTIS
+
+
+
+@app.post("/login")
+def login():
+    username = request.json.get("username", None)
+    password = request.json.get("password", None)
+
+    sql_string = text("select * from user where username = :username")
+    result = db.session.execute(sql_string, {"username": username}).fetchone()
+
+
+
+
+    if not result:
+        return jsonify({"msg": "incorrect username or password"}), 401
+
+    user_id = result[1]
+    hash_password = result[4]
+
+    if check_password_hash(hash_password, password):
+        access_token = create_access_token(identity=str(user_id))
+        return jsonify(access_token=access_token)
+    else:
+        return jsonify({"msg": "incorrect username or password"}), 401
+
+
+
+@app.post("/logout")
+@jwt_required()  # revoke current access token
+def logout():
+    jti = get_jwt()["jti"]
+    REVOKED_JTIS.add(jti)
+    return jsonify(msg="Access token revoked")
+
+
+# @app.post("/register")
+# @jwt_required()
+# def register():
+#     username = request.json.get("username", None)
+#     return jsonify(msg="User Registered Success", username=username)
+
+@app.post("/register")
+def register():
+    username = request.form.get("username")
+    password = request.form.get("password")
+    email = request.form.get("email")
+
+    if not email:
+        return jsonify({"msg": "Email is required"}), 400
+    if not password:
+        return jsonify({"msg": "Password is required"}), 400
+
+    file = request.files.get("profile")
+    profile_image = None
+    if file and file.filename != "":
+        file_name = f"{username}_{secure_filename(file.filename)}"
+        save_path = os.path.join('./static/images/users/', file_name)
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+        file.save(save_path)
+        profile_image = file_name
+
+    user = User(
+        username=username,
+        email=email,
+        password=generate_password_hash(password),
+        profile=profile_image
+    )
+    db.session.add(user)
+    db.session.commit()
+
+    return jsonify({
+        "msg": "User Registered Success",
+        "username": username,
+        "email": email,
+        "profile_image": profile_image
+    }), 200
+
+
+# ==================================================================
+
+@app.before_request
+def before_request():
+    from flask import session, redirect, url_for, request
+    admin_url = request.path
+    is_admin = admin_url.startswith('/admin')
+    if is_admin:
+        if not session.get("user_id"):
+            return redirect(url_for("admin_login"))
+
+    print(admin_url)
+
+
+
+# ==================================================================
+
 
 
 @app.errorhandler(403)
@@ -300,10 +445,14 @@ def script():
     return script
 
 
+
+
 @app.post('/process_checkout')
 def process_checkout():
-    form = request.form
+    from model import Order, OrderItem, Customer
+    from flask_login import current_user
 
+    form = request.form
     first_name = form.get('first_name', '')
     last_name = form.get('last_name', '')
     email = form.get('email', '')
@@ -316,71 +465,107 @@ def process_checkout():
     except json.JSONDecodeError:
         cart_data = []
 
-    token = '8116993901:AAFV2oZ3_MOrEhL_XsqYUjtTIyzOqmqQ0WY'
-    chat_id = '@O_Romdoul'
-
-    # Initialize totals
     exchange_rate = 4100  # 1 USD ≈ 4100 KHR
 
-    # Customer information
+    # ------------------- CALCULATE TOTAL -------------------
+    total = 0
+    for item in cart_data:
+        quantity = item.get('quantity', 1)
+        unit_price = float(item.get('price', 0))
+        total += unit_price * quantity
+    total_khr = total * exchange_rate
+
+    # ------------------- CREATE / GET CUSTOMER -------------------
+    customer = Customer.query.filter_by(email=email).first()
+    if not customer:
+        username = f"{first_name} {last_name}".strip() or email.split("@")[0]
+        customer = Customer(
+            username=username,
+            email=email,
+            password="guest",  # or generate a random password
+            remark="Guest checkout"
+        )
+        db.session.add(customer)
+        db.session.commit()
+
+    # ------------------- CREATE ORDER -------------------
+    new_order = Order(
+        user_id=0,  # if you have logged-in users, use current_user.id
+        customer_id=customer.id,
+        status='pending',
+        total_usd=total,
+        total_khr=total_khr
+    )
+    db.session.add(new_order)
+    db.session.commit()
+
+    # ------------------- SAVE ORDER ITEMS -------------------
+    for item in cart_data:
+        product_id = item.get('id')
+        if not product_id:
+            continue
+        order_item = OrderItem(
+            order_id=new_order.id,
+            product_id=product_id,
+            price=float(item.get('price', 0)),
+            qty=int(item.get('quantity', 1)),
+            total=float(item.get('price', 0)) * int(item.get('quantity', 1))
+        )
+        db.session.add(order_item)
+    db.session.commit()
+
+    # ------------------- TELEGRAM / EMAIL -------------------
     html = f"<b>🛒 New Order Received</b>\n\n"
-    html += f"<b>First Name:</b> {first_name}\n"
-    html += f"<b>Last Name:</b> {last_name}\n"
+    html += f"<b>Customer:</b> {customer.username}\n"
     html += f"<b>Address:</b> {address}\n"
     html += f"<b>Phone:</b> {phone}\n"
     html += f"<b>Email:</b> {email}\n\n"
 
-    # Create table header
     table = "<pre>"
     table += "┌──────────────────────────────────┬──────────┬──────────┐\n"
     table += "│ Item                             │ Quantity │ Price    │\n"
     table += "├──────────────────────────────────┼──────────┼──────────┤\n"
 
-    total = 0
-    # Add items to table
     for item in cart_data:
-        title = item.get('title', 'No title')[:30]  # Limit title length
+        title = item.get('title', 'No title')[:30]
         quantity = item.get('quantity', 1)
-        unit_price = float(item.get('price', 0))  # This should be price per unit
+        unit_price = float(item.get('price', 0))
         item_total = unit_price * quantity
-        total += item_total
-
         table += f"│ {title.ljust(32)} │ {str(quantity).center(8)} │ ${str(item_total).ljust(7)} │\n"
 
-    # Add table footer and total
     table += "└──────────────────────────────────┴──────────┴──────────┘\n"
-
-    # Calculate and format KHR
-    total_khr = total * exchange_rate
-    formatted_khr = "{:,.0f}".format(total_khr).replace(",", ",")
-
+    formatted_khr = "{:,.0f}".format(total_khr)
     table += f"\n<b>TOTAL: ${total:.2f} USD\n"
     table += f"TOTAL: ៛{formatted_khr} KHR</b>"
     table += "</pre>"
 
     html += table
+    sendText(chat_id='@O_Romdoul', message=html)
 
-    res = sendText(
-        chat_id=chat_id,
-        message=html,
-    )
+    # ------------------- SEND EMAIL -------------------
     msg = Message('Invoice From Nana Shop', recipients=[email])
     msg.body = 'This is a plain text email sent from Flask'
-    message = render_template('invoice.html')
-    msg.html = render_template('invoice.html',
-                               customer_name=f"{first_name} {last_name}",
-                               customer_email=email,
-                               customer_address=address,
-                               customer_phone=phone,
-                               items=cart_data,
-                               total=f"${total:.2f}",
-                               total_khr=f"${formatted_khr}"
-                               )
+    msg.html = render_template(
+        'invoice.html',
+        customer_name=customer.username,
+        customer_email=email,
+        customer_address=address,
+        customer_phone=phone,
+        items=cart_data,
+        total=f"${total:.2f}",
+        total_khr=f"{formatted_khr}"
+    )
     mail.send(msg)
 
-    # return f"{res}"
-    return "Email Sent Successfully"
-    # return f"{first_name} {last_name}, {email}, {phone}, {address}, {first_item.get('title', 'No items')}"
+    return "Checkout successful!"
+
+
+
+
+
+
+
+
 
 
 if __name__ == '__main__':

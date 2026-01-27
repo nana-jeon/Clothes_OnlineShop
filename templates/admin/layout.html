@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sidebar</title>
+  <link rel="stylesheet" href="/static/admin/layout.css">
+</head>
+<body>
+
+<aside class="sidebar">
+    <a class="menu {% if module == 'dashboard' %}active{% endif %}" href="/admin/dashboard">Dashboard</a>
+    <a class="menu {% if module == 'user' %}active{% endif %}" href="/admin/user">Users</a>
+    <a class="menu {% if module == 'category' %}active{% endif %}" href="/admin/category">Category</a>
+    <a class="menu {% if module == 'product' %}active{% endif %}" href="/admin/product">Product</a>
+    <a class="menu {% if module == 'order' %}active{% endif %}" href="/admin/order">Order Management</a>
+
+
+    <!-- Logout Button -->
+    <a class="menu logout" href="{{ url_for('admin_login') }}">Logout</a>
+</aside>
+
+
+
+    {% block content %}
+    	
+    {% endblock %}
+
+</body>
+</html>

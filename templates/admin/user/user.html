@@ -1,0 +1,60 @@
+
+ {% extends 'admin/layout.html' %}
+
+  {% block content %}
+    <main class="content">
+
+  <!-- Header -->
+  <header class="header">
+    <h1>Users</h1>
+    <div class="user">👤 Admin</div>
+  </header>
+
+  <!-- Controls -->
+  <section class="controls">
+    <input type="text" placeholder="Search users..." class="search" id="searchInput">
+      <a href="{{ url_for('user_form', status='add') }}" class="btn add-user">+ Add User</a>
+  </section>
+
+  <!-- Users Table -->
+  <section class="panel">
+    <h2>All Users</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for user in users %}
+          <tr>
+{#          <td>{{ user.id }}</td>#}
+          <td>{{ loop.index }}</td>
+          <td>{{ user.username }}</td>
+          <td>{{ user.email }}</td>
+
+
+          <td><span class="active">Active</span></td>
+          <td>
+            <a href="{{ url_for('user_edit', user_id=user.id, status='edit') }}" class="edit">Edit</a>
+            <a href="{{ url_for('user_confirm', user_id=user.id) }}" class="delete">Delete</a>
+          </td>
+        </tr>
+      {% endfor %}
+
+      </tbody>
+    </table>
+  </section>
+
+</main>
+
+  {% endblock %}
+
+
+
+
+

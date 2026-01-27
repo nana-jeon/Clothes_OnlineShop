@@ -1,0 +1,69 @@
+{% extends 'admin/layout.html' %}
+
+{% block content %}
+<main class="content">
+
+  <!-- Header -->
+  <header class="header">
+    <h1>Products</h1>
+    <div class="user">👤 Admin</div>
+  </header>
+
+  <!-- Controls -->
+  <section class="controls">
+    <input type="text" placeholder="Search products..." class="search" id="searchInput">
+    <a href="{{ url_for('add_product', status='add') }}" class="btn add-user">+ Create Product</a>
+  </section>
+
+  <!-- Products Table -->
+  <section class="panel">
+    <h2>All Products</h2>
+    <table>
+      <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Cost ($)</th>
+            <th>Price ($)</th>
+            <th>Image</th>
+            <th>Stock</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for product in products %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ product.name }}</td>
+            <td>{{ product.category.name if product.category else 'N/A' }}</td>
+            <td>${{ "%.2f"|format(product.cost or 0) }}</td>
+            <td>${{ "%.2f"|format(product.price or 0) }}</td>
+
+            <!-- Image -->
+            <td>
+              {% if product.image %}
+                <img src="{{ url_for('static', filename='images/product/' ~ product.image) }}"
+                     alt="{{ product.name }}" style="width:50px; height:50px; object-fit:cover; border-radius:4px;">
+              {% else %}
+                No image
+              {% endif %}
+            </td>
+
+            <td>{{ product.stock or 0 }}</td>
+            <td>{{ product.description or '' }}</td>
+
+            <!-- Actions -->
+            <td>
+              <a href="{{ url_for('product_edit', product_id=product.id, status='edit') }}" class="edit">Edit</a>
+              <a href="{{ url_for('product_confirm', product_id=product.id) }}" class="delete">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+</main>
+{% endblock %}

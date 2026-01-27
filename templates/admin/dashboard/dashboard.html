@@ -1,0 +1,117 @@
+{% extends 'admin/layout.html' %}
+
+{% block content %}
+<main class="content">
+
+  <!-- Header -->
+  <header class="header">
+    <h1>Admin Dashboard</h1>
+    <div class="user">👤 Admin</div>
+  </header>
+
+  <!-- Stats -->
+  <section class="stats">
+    <div class="stat-card">
+      <p>Total Users</p>
+      <h2>{{ total_users or 0 }}</h2>
+    </div>
+    <div class="stat-card">
+      <p>Total Orders</p>
+      <h2>{{ total_orders or 0 }}</h2>
+    </div>
+    <div class="stat-card">
+      <p>Total Revenue</p>
+      <h2>${{ total_revenue or 0 }}</h2>
+    </div>
+    <div class="stat-card">
+      <p>Products</p>
+      <h2>{{ total_products or 0 }}</h2>
+    </div>
+  </section>
+
+  <!-- System Overview -->
+  <section class="panel">
+    <h2>System Overview</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th>Value</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Server Status</td>
+          <td>Online</td>
+          <td><span class="success">Healthy</span></td>
+        </tr>
+        <tr>
+          <td>Database</td>
+          <td>Connected</td>
+          <td><span class="success">OK</span></td>
+        </tr>
+        <tr>
+          <td>API Requests (Today)</td>
+          <td>{{ api_requests_today or 0 }}</td>
+          <td><span class="info">Normal</span></td>
+        </tr>
+        <tr>
+          <td>Errors (Today)</td>
+          <td>{{ error_count_today or 0 }}</td>
+          <td>
+            {% if error_count_today and error_count_today > 0 %}
+              <span class="warning">Check</span>
+            {% else %}
+              <span class="success">None</span>
+            {% endif %}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Recent Activity (No Users) -->
+  <section class="panel">
+    <h2>Recent System Activity</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Action</th>
+          <th>Module</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in recent_logs %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ log.action }}</td>
+          <td>{{ log.module }}</td>
+          <td>{{ log.created_at }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="4" style="text-align:center; color:#888;">
+            No recent activity
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Quick Actions -->
+  <section class="panel">
+    <h2>Quick Actions</h2>
+    <div class="actions">
+      <a href="/admin/user" class="btn">👥 Manage Users</a>
+      <a href="/admin/product" class="btn">📦 Manage Products</a>
+      <a href="/admin/order" class="btn">🧾 View Orders</a>
+      <a href="/admin/settings" class="btn danger">⚙ System Settings</a>
+    </div>
+  </section>
+
+</main>
+{% endblock %}

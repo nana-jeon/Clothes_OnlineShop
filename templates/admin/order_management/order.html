@@ -1,0 +1,85 @@
+{% extends 'admin/layout.html' %}
+
+{% block content %}
+<main class="content">
+
+  <!-- Header -->
+  <header class="header">
+    <h1>Order Management</h1>
+    <div class="user">👤 Admin</div>
+  </header>
+
+  <!-- Stats -->
+  <section class="stats">
+    <div class="stat-card">
+      <p>Total Orders</p>
+      <h2>{{ total_orders or 0 }}</h2>
+    </div>
+    <div class="stat-card">
+      <p>Pending Orders</p>
+      <h2>{{ pending_orders or 0 }}</h2>
+    </div>
+    <div class="stat-card">
+      <p>Completed Orders</p>
+      <h2>{{ completed_orders or 0 }}</h2>
+    </div>
+    <div class="stat-card">
+      <p>Total Revenue</p>
+      <h2>${{ total_revenue or 0 }}</h2>
+    </div>
+  </section>
+
+  <!-- Orders Table -->
+  <section class="panel">
+    <h2>Orders List</h2>
+    <table>
+      <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Status</th>
+            <th>Date Time</th>
+            <th>Total USD</th>
+            <th>Total KHR</th>
+            <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% if orders %}
+        {% for order in orders %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ order.customer.username }}</td>
+          <td>
+            {% if order.status == 'pending' %}
+              <span class="warning">Pending</span>
+            {% elif order.status == 'completed' %}
+              <span class="success">Completed</span>
+            {% elif order.status == 'cancelled' %}
+              <span class="danger">Cancelled</span>
+            {% else %}
+              <span class="info">{{ order.status }}</span>
+            {% endif %}
+          </td>
+          <td>{{ order.date_time.strftime("%Y-%m-%d %H:%M") }}</td>
+          <td>${{ "%.2f"|format(order.total_usd) }}</td>
+          <td>៛{{ order.formatted_khr }}</td>
+          <td>
+            <a href="{{ url_for('order_detail', order_id=order.id) }}" class="btn">View</a>
+          </td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="7" style="text-align:center; color:#888;">
+            No orders found
+          </td>
+        </tr>
+      {% endif %}
+    </tbody>
+
+    </table>
+  </section>
+
+</main>
+{% endblock %}

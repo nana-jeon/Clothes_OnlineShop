@@ -1,0 +1,46 @@
+{% extends 'admin/layout.html' %}
+
+{% block content %}
+<main class="content">
+
+  <!-- Header -->
+  <header class="header">
+    <h1>Categories</h1>
+    <div class="user">👤 Admin</div>
+  </header>
+
+  <!-- Controls -->
+  <section class="controls">
+    <input type="text" placeholder="Search categories..." class="search" id="searchInput">
+    <a href="{{ url_for('category_form', status='add') }}" class="btn add-user">+ Create Category</a>
+  </section>
+
+  <!-- Categories Table -->
+  <section class="panel">
+    <h2>All Categories</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Category Name</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for category in categories %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ category.name }}</td>
+          <td>
+            <a href="{{ url_for('category_edit', id=category.id, status='edit') }}" class="edit">Edit</a>
+            <a href="{{ url_for('category_confirm', id=category.id) }}" class="delete">Delete</a>
+
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+</main>
+{% endblock %}

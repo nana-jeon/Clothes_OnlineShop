@@ -1,5 +1,6 @@
 from app import db
 
+
 class Branch(db.Model):
     __tablename__ = 'branch'
     id = db.Column(db.Integer, primary_key=True)

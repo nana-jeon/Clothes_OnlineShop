@@ -4,6 +4,8 @@ from sqlalchemy import text
 from flask import request, jsonify
 from model.product import Product
 from werkzeug.utils import secure_filename
+import os
+
 
 
 

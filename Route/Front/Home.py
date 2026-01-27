@@ -1,6 +1,7 @@
 from flask import render_template
 from products_list import pro_list
-from app import app, db  # Import your app, not Flask
+from app import app, db
+
 
 @app.route('/')
 def index():

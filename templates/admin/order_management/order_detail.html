@@ -1,0 +1,83 @@
+{% extends 'admin/layout.html' %}
+
+{% block content %}
+<main class="content">
+
+  <!-- Header -->
+  <header class="header">
+    <h1>Order Detail</h1>
+    <div class="user">👤 Admin</div>
+  </header>
+
+  <!-- Order Info -->
+  <section class="panel">
+    <h2>Order #{{ order.id }}</h2>
+    <table>
+      <tr>
+        <th>Customer</th>
+        <td>{{ order.customer.username if order.customer else 'Guest' }}</td>
+      </tr>
+      <tr>
+        <th>Status</th>
+        <td>
+          {% if order.status == 'pending' %}
+            <span class="warning">Pending</span>
+          {% elif order.status == 'completed' %}
+            <span class="success">Completed</span>
+          {% elif order.status == 'cancelled' %}
+            <span class="danger">Cancelled</span>
+          {% else %}
+            <span class="info">{{ order.status }}</span>
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <th>Date</th>
+        <td>{{ order.date_time.strftime("%Y-%m-%d %H:%M") }}</td>
+      </tr>
+      <tr>
+        <th>Total USD</th>
+        <td>${{ "%.2f"|format(order.total_usd) }}</td>
+      </tr>
+      <tr>
+        <th>Total KHR</th>
+        <td>៛{{ order.formatted_khr }}</td>
+      </tr>
+    </table>
+  </section>
+
+  <!-- Order Items -->
+  <section class="panel">
+    <h2>Items</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Qty</th>
+          <th>Price (USD)</th>
+          <th>Total (USD)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if items %}
+          {% for item in items %}
+          <tr>
+            <td>{{ item.product.name if item.product else 'Product #' ~ item.product_id }}</td>
+            <td>{{ item.qty }}</td>
+            <td>${{ "%.2f"|format(item.price) }}</td>
+            <td>${{ "%.2f"|format(item.total) }}</td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="4" style="text-align:center; color:#888;">No items found</td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </section>
+
+  <a href="{{ url_for('admin_orders') }}" class="btn">← Back to Orders</a>
+
+</main>
+{% endblock %}

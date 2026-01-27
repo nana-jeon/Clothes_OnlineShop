@@ -1,0 +1,47 @@
+{% extends 'admin/layout.html' %}
+
+{% block content %}
+<main class="content">
+
+  <!-- Header -->
+  <header class="header">
+    <h1>Edit Category</h1>
+    <div class="user">👤 Admin</div>
+  </header>
+
+  <!-- Controls -->
+  <section class="controls">
+    <a href="/admin/category" class="btn back">⬅ Back To User List</a>
+  </section>
+
+  <!-- Add User Form -->
+  <section class="form-card">
+    <form method="POST" action="{{ url_for('category_updated' , category_id = category.id) }}">
+
+        {# category_id #}
+        <input type="hidden" name="category_id" value="{{ category.id }}">
+
+
+
+        {# Category name #}
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" name="name" placeholder="Enter full name" value="{{ category.name }}" required>
+        </div>
+
+      </div>
+
+    <div class="form-buttons">
+            <button type="submit" class="product-btn">Update</button>
+      <a href="/admin/category" class="product-btn cancel">Cancel</a>
+
+      <button type="reset" class="product-btn reset-btn">Reset</button>
+    </div>
+
+
+    </form>
+  </section>
+
+</main>
+{% endblock %}
