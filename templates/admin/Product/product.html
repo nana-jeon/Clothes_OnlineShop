@@ -11,7 +11,6 @@
 
   <!-- Controls -->
   <section class="controls">
-    <input type="text" placeholder="Search products..." class="search" id="searchInput">
     <a href="{{ url_for('add_product', status='add') }}" class="btn add-user">+ Create Product</a>
   </section>
 
@@ -41,15 +40,14 @@
             <td>${{ "%.2f"|format(product.cost or 0) }}</td>
             <td>${{ "%.2f"|format(product.price or 0) }}</td>
 
-            <!-- Image -->
             <td>
-              {% if product.image %}
-                <img src="{{ url_for('static', filename='images/product/' ~ product.image) }}"
-                     alt="{{ product.name }}" style="width:50px; height:50px; object-fit:cover; border-radius:4px;">
-              {% else %}
-                No image
-              {% endif %}
+              <img
+                src="{{ url_for('static', filename='images/product/' ~ product.image) if product.image else url_for('static', filename='images/placeholder.png') }}"
+                alt="{{ product.name }}"
+                width="50" height="50"
+                style="object-fit:cover; border-radius:4px;">
             </td>
+
 
             <td>{{ product.stock or 0 }}</td>
             <td>{{ product.description or '' }}</td>

@@ -5,10 +5,8 @@
   <h1>Update Product</h1>
   <form action="{{ url_for('product_updated') }}" method="POST" enctype="multipart/form-data">
 
-
     <!-- Hidden product ID -->
     <input type="hidden" name="product_id" value="{{ product.id }}">
-
 
     <!-- Product Name -->
     <label for="name">Product Name</label>
@@ -19,9 +17,7 @@
     <select id="category" name="category" required>
       <option value="">Select a category</option>
       {% for category in categories %}
-        <option value="{{ category.id }}" {% if category.id == product.category_id %}selected{% endif %}>
-          {{ category.name }}
-        </option>
+        <option value="{{ category.id }}" {% if category.id == product.category_id %}selected{% endif %}>{{ category.name }}</option>
       {% endfor %}
     </select>
 
@@ -35,12 +31,13 @@
 
     <!-- Image -->
     <label for="image">Product Image</label>
-     <input type="file" name="image">
-    {% if product.image %}
-      <p>Current image:</p>
-      <img src="{{ url_for('static', filename='images/product/' ~ product.image) }}"
-           alt="Product Image" style="max-width: 150px; margin-bottom: 10px;">
-    {% endif %}
+    <input type="file" name="image">
+    <div style="margin-bottom:10px;">
+      <img
+        src="{{ url_for('static', filename='images/product/' ~ product.image) if product.image else url_for('static', filename='images/placeholder.png') }}"
+        alt="Product Image"
+        style="max-width:150px; display:block;">
+    </div>
 
     <!-- Stock -->
     <label for="stock">Stock</label>
@@ -52,10 +49,8 @@
 
     <!-- Buttons -->
     <div class="form-buttons">
-      <div>
-        <button type="submit" class="product-btn">Update</button>
-        <a href="/admin/product" class="product-btn cancel">Cancel</a>
-      </div>
+      <button type="submit" class="product-btn">Update</button>
+      <a href="/admin/product" class="product-btn cancel">Cancel</a>
       <button type="reset" class="product-btn reset-btn">Reset</button>
     </div>
 
