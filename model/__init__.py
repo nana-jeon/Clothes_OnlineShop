@@ -7,3 +7,5 @@ from model.product import *
 from model.customer_cart import *
 from model.order import *
 from model.order_item import *
+
+# Name: Kea Sreylis
