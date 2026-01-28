@@ -10,20 +10,25 @@ from flask import request, render_template, session, url_for, redirect, Flask, c
 from model import User, Product, Order, Category
 
 
-UPLOAD_FOLDER = './static/images/users'
+# UPLOAD_FOLDER = './static/images/users'
+# os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'images', 'product')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 
 
 @app.get('/admin/product')
 def product_form():
     module = 'product'
-    products = Product.query.all()
+    # products = Product.query.all()
+    products = Product.query.order_by(Product.id.desc()).limit(20).all()
 
     # Convert Numeric fields to float for Jinja
-    for p in products:
-        p.cost = float(p.cost) if p.cost is not None else 0.0
-        p.price = float(p.price) if p.price is not None else 0.0
-        p.stock = float(p.stock) if p.stock is not None else 0.0
+    # for p in products:
+    #     p.cost = float(p.cost) if p.cost is not None else 0.0
+    #     p.price = float(p.price) if p.price is not None else 0.0
+    #     p.stock = float(p.stock) if p.stock is not None else 0.0
 
     return render_template('admin/product/product.html', module=module, products=products)
 
@@ -32,17 +37,24 @@ def product_form():
 def add_product():
     module = 'product'
     status = request.args.get('status')
-    product = Product.query.all()
+    # product = Product.query.all()
+    product = Product.query.limit(20).all()
     categories = Category.query.all()
 
     return render_template('admin/Product/create_product.html', module=module, status=status, products=product, categories=categories)
 
 
 
+
 @app.get('/admin/product/product_confirm')  # delete product
 def product_confirm():
     module = 'product'
-    product_id = int(request.args.get('product_id'))
+    # product_id = int(request.args.get('product_id'))
+
+    product_id = request.args.get('product_id', type=int)
+    if not product_id:
+        return redirect(url_for('product_form'))
+
     product = Product.query.filter_by(id=product_id).first()
     return render_template('admin/Product/delete.html', module=module, product=product)
 
@@ -52,7 +64,8 @@ def product_confirm():
 def product_edit():
     module = 'product'
     status = request.args.get('status')
-    categories = Category.query.all()
+    # categories = Category.query.all()
+    categories = Category.query.limit(20).all()
     product = None
     if status == 'edit':
         product_id = int(request.args.get('product_id'))

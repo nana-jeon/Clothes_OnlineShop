@@ -41,15 +41,31 @@
             <td>${{ "%.2f"|format(product.cost or 0) }}</td>
             <td>${{ "%.2f"|format(product.price or 0) }}</td>
 
+{#            <!-- Image -->#}
+{#            <td>#}
+{#              {% if product.image %}#}
+{#                <img src="{{ url_for('static', filename='images/product/' ~ product.image) }}"#}
+{#                     alt="{{ product.name }}" style="width:50px; height:50px; object-fit:cover; border-radius:4px;">#}
+{#              {% else %}#}
+{#                No image#}
+{#              {% endif %}#}
+{#            </td>#}
+
+
             <!-- Image -->
             <td>
-              {% if product.image %}
-                <img src="{{ url_for('static', filename='images/product/' ~ product.image) }}"
-                     alt="{{ product.name }}" style="width:50px; height:50px; object-fit:cover; border-radius:4px;">
-              {% else %}
-                No image
-              {% endif %}
+              <img
+                src="{% if product.image %}
+                       {{ url_for('static', filename='images/product/' ~ product.image) }}
+                     {% else %}
+                       {{ url_for('static', filename='images/no-image.png') }}
+                     {% endif %}"
+                alt="{{ product.name }}"
+                style="width:50px; height:50px; object-fit:cover; border-radius:4px;"
+                onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/no-image.png') }}';"
+              >
             </td>
+
 
             <td>{{ product.stock or 0 }}</td>
             <td>{{ product.description or '' }}</td>

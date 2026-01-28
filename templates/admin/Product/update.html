@@ -33,14 +33,31 @@
     <label for="price">Price ($)</label>
     <input type="number" id="price" name="price" step="0.01" min="0" value="{{ product.price }}" required>
 
-    <!-- Image -->
-    <label for="image">Product Image</label>
-     <input type="file" name="image">
-    {% if product.image %}
-      <p>Current image:</p>
-      <img src="{{ url_for('static', filename='images/product/' ~ product.image) }}"
-           alt="Product Image" style="max-width: 150px; margin-bottom: 10px;">
-    {% endif %}
+{#    <!-- Image -->#}
+{#    <label for="image">Product Image</label>#}
+{#     <input type="file" name="image">#}
+{#    {% if product.image %}#}
+{#      <p>Current image:</p>#}
+{#      <img src="{{ url_for('static', filename='images/product/' ~ product.image) }}"#}
+{#           alt="Product Image" style="max-width: 150px; margin-bottom: 10px;">#}
+{#    {% endif %}#}
+
+          <!-- Product Image -->
+        <label for="image">Product Image</label>
+        <input type="file" name="image">
+
+        <p style="margin-top:8px;">Current image:</p>
+        <img
+          src="{% if product.image %}
+                 {{ url_for('static', filename='images/product/' ~ product.image) }}
+               {% else %}
+                 {{ url_for('static', filename='images/no-image.png') }}
+               {% endif %}"
+          alt="Product Image"
+          style="max-width:150px; height:auto; border-radius:6px; border:1px solid #ddd;"
+          onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/no-image.png') }}';"
+        />
+
 
     <!-- Stock -->
     <label for="stock">Stock</label>

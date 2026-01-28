@@ -44,17 +44,17 @@ jwt = JWTManager(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 
-engine = create_engine(
-    "mysql+mysqldb://",
-    connect_args={
-        "user": "nana",
-        "password": "**aA12345",  # Raw password with @ symbol
-        "host": "localhost",
-        "database": "nana",
-        "charset": "utf8mb4",
-        "auth_plugin": "mysql_native_password"
-    }
-)
+# engine = create_engine(
+#     "mysql+mysqldb://",
+#     connect_args={
+#         "user": "nana",
+#         "password": "**aA12345",  # Raw password with @ symbol
+#         "host": "localhost",
+#         "database": "nana",
+#         "charset": "utf8mb4",
+#         "auth_plugin": "mysql_native_password"
+#     }
+# )
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -203,14 +203,14 @@ def error_500(error):
 # ======================================================================================================
 
 
-@app.route('/sendMail')
-def send_email():
-    msg = Message('Invoice From Nana Shop', recipients=['sreylis534@gmail.com'])
-    msg.body = 'This is a plain text email sent from Flask'
-    message = render_template('invoice.html')
-    msg.html = message
-    mail.send(msg)
-    return 'Email sent succesfully!'
+# @app.route('/sendMail')
+# def send_email():
+#     msg = Message('Invoice From Nana Shop', recipients=['sreylis534@gmail.com'])
+#     msg.body = 'This is a plain text email sent from Flask'
+#     message = render_template('invoice.html')
+#     msg.html = message
+#     mail.send(msg)
+#     return 'Email sent succesfully!'
 
 
 @app.get('/Scripts')
@@ -557,20 +557,20 @@ def process_checkout():
     html += table
     sendText(chat_id='@O_Romdoul', message=html)
 
-    # ------------------- SEND EMAIL -------------------
-    msg = Message('Invoice From Nana Shop', recipients=[email])
-    msg.body = 'This is a plain text email sent from Flask'
-    msg.html = render_template(
-        'invoice.html',
-        customer_name=customer.username,
-        customer_email=email,
-        customer_address=address,
-        customer_phone=phone,
-        items=cart_data,
-        total=f"${total:.2f}",
-        total_khr=f"{formatted_khr}"
-    )
-    mail.send(msg)
+    # # ------------------- SEND EMAIL -------------------
+    # msg = Message('Invoice From Nana Shop', recipients=[email])
+    # msg.body = 'This is a plain text email sent from Flask'
+    # msg.html = render_template(
+    #     'invoice.html',
+    #     customer_name=customer.username,
+    #     customer_email=email,
+    #     customer_address=address,
+    #     customer_phone=phone,
+    #     items=cart_data,
+    #     total=f"${total:.2f}",
+    #     total_khr=f"{formatted_khr}"
+    # )
+    # mail.send(msg)
 
     return "Checkout successful!"
 
