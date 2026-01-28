@@ -30,7 +30,7 @@ def product_form():
     #     p.price = float(p.price) if p.price is not None else 0.0
     #     p.stock = float(p.stock) if p.stock is not None else 0.0
 
-    return render_template('admin/product/product.html', module=module, products=products)
+    return render_template('admin/Product/product.html', module=module, products=products)
 
 
 @app.get('/admin/product/add')
