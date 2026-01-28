@@ -61,7 +61,7 @@
               <span class="info">{{ order.status }}</span>
             {% endif %}
           </td>
-          <td>{{ order.date_time.strftime("%Y-%m-%d %H:%M") }}</td>
+          <td>{{ current_time.strftime("%Y-%m-%d %H:%M") }}</td>
           <td>${{ "%.2f"|format(order.total_usd) }}</td>
           <td>៛{{ order.formatted_khr }}</td>
           <td>

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from alembic.script.write_hooks import module
 from app import app, db
 from sqlalchemy import text, false
@@ -8,6 +10,7 @@ from werkzeug.security import  generate_password_hash
 
 @app.route('/admin/order')
 def admin_orders():
+    current_time = datetime.now()
     orders = Order.query.all()
     usd_to_khr = 4100  # exchange rate
 
@@ -35,7 +38,8 @@ def admin_orders():
         total_revenue=total_usd,
         total_usd=total_usd,
         total_khr=total_khr,
-        formatted_total_khr=formatted_total_khr
+        formatted_total_khr=formatted_total_khr,
+        current_time=current_time,
     )
 
 
@@ -48,6 +52,7 @@ def order_detail(order_id):
     from model import Order, OrderItem
 
     usd_to_khr = 4100  # exchange rate
+    current_time = datetime.now()
 
     # Get order
     order = Order.query.get_or_404(order_id)
@@ -66,7 +71,8 @@ def order_detail(order_id):
     return render_template(
         'admin/order_management/order_detail.html',
         order=order,
-        items=items
+        items=items,
+        current_time=current_time,
     )
 
 
