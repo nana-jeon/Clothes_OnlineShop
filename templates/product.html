@@ -63,36 +63,47 @@
 
 {% endblock %}
 
+
+
+
 {% block custom_script %}
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+function countCartItem() {
+    let carts_count = (JSON.parse(localStorage.getItem('carts')) || []).length;
+    document.getElementById('btn-card').innerText = `Cart(${carts_count})`;
+}
 
-    let carts = JSON.parse(localStorage.getItem('carts')) || [];
+// Run once on page load
+countCartItem();
 
-    document.querySelectorAll('.btn-add-to-cart').forEach(button => {
-        button.addEventListener('click', function () {
+// Add this inside your add-to-cart code
+document.querySelectorAll('.btn-add-to-cart').forEach(button => {
+    button.addEventListener('click', function () {
 
-            const product = {
-                id: this.dataset.id,
-                title: this.dataset.title,
-                price: this.dataset.price,
-                image: this.dataset.image,
-                quantity: 1
-            };
+        const product = {
+            id: this.dataset.id,
+            title: this.dataset.title,
+            price: parseFloat(this.dataset.price),
+            image: this.dataset.image,
+            quantity: 1
+        };
 
-            const existingIndex = carts.findIndex(item => item.id === product.id);
+        let carts = JSON.parse(localStorage.getItem('carts')) || [];
 
-            if (existingIndex >= 0) {
-                carts[existingIndex].quantity += 1;
-            } else {
-                carts.push(product);
-            }
+        const existingIndex = carts.findIndex(item => item.id === product.id);
 
-            localStorage.setItem('carts', JSON.stringify(carts));
-            countCartItem();
-        });
+        if (existingIndex >= 0) {
+            carts[existingIndex].quantity += 1;
+        } else {
+            carts.push(product);
+        }
+
+        localStorage.setItem('carts', JSON.stringify(carts));
+
+        // Update cart count immediately
+        countCartItem();
     });
-
 });
 </script>
+
 {% endblock %}
