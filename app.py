@@ -203,14 +203,14 @@ def error_500(error):
 # ======================================================================================================
 
 
-@app.route('/sendMail')
-def send_email():
-    msg = Message('Invoice From Nana Shop', recipients=['sreylis534@gmail.com'])
-    msg.body = 'This is a plain text email sent from Flask'
-    message = render_template('invoice.html')
-    msg.html = message
-    mail.send(msg)
-    return 'Email sent succesfully!'
+# @app.route('/sendMail')
+# def send_email():
+#     msg = Message('Invoice From Nana Shop', recipients=['sreylis534@gmail.com'])
+#     msg.body = 'This is a plain text email sent from Flask'
+#     message = render_template('invoice.html')
+#     msg.html = message
+#     mail.send(msg)
+#     return 'Email sent succesfully!'
 
 
 @app.get('/Scripts')
@@ -530,47 +530,47 @@ def process_checkout():
     db.session.commit()
 
     # ------------------- TELEGRAM / EMAIL -------------------
-    # html = f"<b>🛒 New Order Received</b>\n\n"
-    # html += f"<b>Customer:</b> {customer.username}\n"
-    # html += f"<b>Address:</b> {address}\n"
-    # html += f"<b>Phone:</b> {phone}\n"
-    # html += f"<b>Email:</b> {email}\n\n"
-    #
-    # table = "<pre>"
-    # table += "┌──────────────────────────────────┬──────────┬──────────┐\n"
-    # table += "│ Item                             │ Quantity │ Price    │\n"
-    # table += "├──────────────────────────────────┼──────────┼──────────┤\n"
-    #
-    # for item in cart_data:
-    #     title = item.get('title', 'No title')[:30]
-    #     quantity = item.get('quantity', 1)
-    #     unit_price = float(item.get('price', 0))
-    #     item_total = unit_price * quantity
-    #     table += f"│ {title.ljust(32)} │ {str(quantity).center(8)} │ ${str(item_total).ljust(7)} │\n"
-    #
-    # table += "└──────────────────────────────────┴──────────┴──────────┘\n"
-    # formatted_khr = "{:,.0f}".format(total_khr)
-    # table += f"\n<b>TOTAL: ${total:.2f} USD\n"
-    # table += f"TOTAL: ៛{formatted_khr} KHR</b>"
-    # table += "</pre>"
-    #
-    # html += table
-    # sendText(chat_id='@O_Romdoul', message=html)
+    html = f"<b>🛒 New Order Received</b>\n\n"
+    html += f"<b>Customer:</b> {customer.username}\n"
+    html += f"<b>Address:</b> {address}\n"
+    html += f"<b>Phone:</b> {phone}\n"
+    html += f"<b>Email:</b> {email}\n\n"
+
+    table = "<pre>"
+    table += "┌──────────────────────────────────┬──────────┬──────────┐\n"
+    table += "│ Item                             │ Quantity │ Price    │\n"
+    table += "├──────────────────────────────────┼──────────┼──────────┤\n"
+
+    for item in cart_data:
+        title = item.get('title', 'No title')[:30]
+        quantity = item.get('quantity', 1)
+        unit_price = float(item.get('price', 0))
+        item_total = unit_price * quantity
+        table += f"│ {title.ljust(32)} │ {str(quantity).center(8)} │ ${str(item_total).ljust(7)} │\n"
+
+    table += "└──────────────────────────────────┴──────────┴──────────┘\n"
+    formatted_khr = "{:,.0f}".format(total_khr)
+    table += f"\n<b>TOTAL: ${total:.2f} USD\n"
+    table += f"TOTAL: ៛{formatted_khr} KHR</b>"
+    table += "</pre>"
+
+    html += table
+    sendText(chat_id='@O_Romdoul', message=html)
 
     # ------------------- SEND EMAIL -------------------
-    msg = Message('Invoice From Nana Shop', recipients=[email])
-    msg.body = 'This is a plain text email sent from Flask'
-    msg.html = render_template(
-        'invoice.html',
-        customer_name=customer.username,
-        customer_email=email,
-        customer_address=address,
-        customer_phone=phone,
-        items=cart_data,
-        total=f"${total:.2f}",
-        total_khr=f"{formatted_khr}"
-    )
-    mail.send(msg)
+    # msg = Message('Invoice From Nana Shop', recipients=[email])
+    # msg.body = 'This is a plain text email sent from Flask'
+    # msg.html = render_template(
+    #     'invoice.html',
+    #     customer_name=customer.username,
+    #     customer_email=email,
+    #     customer_address=address,
+    #     customer_phone=phone,
+    #     items=cart_data,
+    #     total=f"${total:.2f}",
+    #     total_khr=f"{formatted_khr}"
+    # )
+    # mail.send(msg)
 
     # return "Checkout successful!"
 
