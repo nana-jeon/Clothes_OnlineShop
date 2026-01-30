@@ -1,138 +1,135 @@
-{#{% extends 'master.html' %}#}
+{% extends 'master.html' %}
 <link rel="stylesheet" href="/static/style.css" />
+
 {% block content %}
-<body>
+<main>
+    <div class="cart-header">
+        <h1>Your Shopping Cart</h1>
+    </div>
 
-    <main>
-        <div class="cart-header">
-            <h1>Your Shopping Cart</h1>
+    <div class="cart-items" id="cart-items-container">
+        <!-- Cart items will be dynamically inserted here -->
+    </div>
+
+    <div class="order-summary">
+        <h3 class="summary-title">Order Summary</h3>
+        <div class="summary-row">
+            <span>Subtotal</span>
+            <span id="subtotal">$0.00</span>
         </div>
-
-        <div class="cart-items" id="cart-items-container">
-            <!-- Cart items will be dynamically inserted here -->
+        <div class="summary-row summary-total">
+            <span>Total</span>
+            <span id="total">$0.00</span>
         </div>
-
-        <div class="order-summary">
-            <h3 class="summary-title">Order Summary</h3>
-            <div class="summary-row">
-                <span>Subtotal</span>
-                <span id="subtotal">$0.00</span>
-            </div>
-            <div class="summary-row summary-total">
-                <span>Total</span>
-                <span id="total">$0.00</span>
-            </div>
-            <hr>
-            <div class="action-buttons">
-                <a href="/product" class="btn btn-continue">Continue Shopping</a>
-                <a href="/check_out" class="btn btn-checkout">Proceed to Checkout</a>
-            </div><br><br>
+        <hr>
+        <div class="action-buttons">
+            <a href="/product" class="btn btn-continue">Continue Shopping</a>
+            <a href="/check_out" class="btn btn-checkout">Proceed to Checkout</a>
         </div>
-    </main>
+    </div>
+</main>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const EXCHANGE_RATE = 4100; // 1 USD = 4100៛
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const EXCHANGE_RATE = 4100; // 1 USD = 4100៛
 
-            // DOM Elements
-            const cartContainer = document.getElementById('cart-items-container');
-            const subtotalElement = document.getElementById('subtotal');
-            const totalElement = document.getElementById('total');
+    // DOM Elements
+    const cartContainer = document.getElementById('cart-items-container');
+    const subtotalElement = document.getElementById('subtotal');
+    const totalElement = document.getElementById('total');
 
-            // Load cart from localStorage
-            let carts = JSON.parse(localStorage.getItem('carts')) || [];
+    // Load cart from localStorage
+    let carts = JSON.parse(localStorage.getItem('carts')) || [];
 
-            // Render cart items
-            function renderCart() {
-                cartContainer.innerHTML = '';
+    // Render cart items
+    function renderCart() {
+        cartContainer.innerHTML = '';
 
-                if (carts.length === 0) {
-                    cartContainer.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
-                    updateTotals(0);
-                    return;
-                }
+        if (carts.length === 0) {
+            cartContainer.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
+            updateTotals(0);
+            return;
+        }
 
-                carts.forEach((item, index) => {
-                    const itemElement = document.createElement('div');
-                    itemElement.className = 'cart-item';
-                    itemElement.dataset.index = index;
+        carts.forEach((item, index) => {
+            const itemElement = document.createElement('div');
+            itemElement.className = 'cart-item';
+            itemElement.dataset.index = index;
 
-                    const price = parseFloat(item.price);
-                    const ItemPrice = price * item.quantity;
-                    const totalPriceKHR = (ItemPrice * EXCHANGE_RATE).toLocaleString('en-US');
+            const price = parseFloat(item.price);
+            const ItemPrice = price * item.quantity;
+            const totalPriceKHR = (ItemPrice * EXCHANGE_RATE).toLocaleString('en-US');
 
-                    itemElement.innerHTML = `
-                        <div class="item-image">
-                            <img src="${item.image}" alt="${item.title}">
+            const imageSrc = item.image.startsWith('/static') ? item.image : `/static/images/product/${item.image}`;
+
+            itemElement.innerHTML = `
+                <div class="item-image">
+                    <img src="${imageSrc}" alt="${item.title}">
+                </div>
+                <div class="item-details">
+                    <h3 class="item-title">${item.title}</h3>
+                    <div class="summary-row">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn minus" data-index="${index}">-</button>
+                            <span class="quantity">${item.quantity}</span>
+                            <button class="quantity-btn plus" data-index="${index}">+</button>
                         </div>
-                        <div class="item-details">
-                            <h3 class="item-title">${item.title}</h3>
-                            <div class="summary-row">
-                                <div class="quantity-controls">
-                                    <button class="quantity-btn minus" data-index="${index}">-</button>
-                                    <span class="quantity">${item.quantity}</span>
-                                    <button class="quantity-btn plus" data-index="${index}">+</button>
-                                </div>
-                                <div class="price-display">
-                                    <span class="price-usd">$${ItemPrice.toFixed(2)}</span>
-                                    <span class="price-khr">៛${totalPriceKHR}</span>
-                                </div>
-                            </div>
-                            <a href="#" class="item-remove" data-index="${index}">Remove</a>
+                        <div class="price-display">
+                            <span class="price-usd">$${ItemPrice.toFixed(2)}</span>
+                            <span class="price-khr">៛${totalPriceKHR}</span>
                         </div>
-                    `;
+                    </div>
+                    <a href="#" class="item-remove" data-index="${index}">Remove</a>
+                </div>
+            `;
 
-                    cartContainer.appendChild(itemElement);
-                });
-
-                updateTotals(calculateSubtotal());
-            }
-
-            // Calculate subtotal
-            function calculateSubtotal() {
-                return carts.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
-            }
-
-            // Update all totals
-            function updateTotals(subtotal) {
-                const total = subtotal ;
-                const totalKHR = (total * 4100).toLocaleString('en-US');
-
-                // Update USD values
-                subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
-
-                // Create dual currency display for total
-                totalElement.innerHTML = `
-                    <span class="price-usd">$${total.toFixed(2)}</span>
-                    <span class="price-khr">៛${totalKHR}</span>
-                `;
-            }
-
-            // Event delegation for cart interactions
-            cartContainer.addEventListener('click', function(e) {
-                const index = e.target.dataset.index;
-
-                if (e.target.classList.contains('minus')) {
-                    if (carts[index].quantity > 1) {
-                        carts[index].quantity--;
-                    } else {
-                        carts.splice(index, 1);
-                    }
-                } else if (e.target.classList.contains('plus')) {
-                    carts[index].quantity++;
-                } else if (e.target.classList.contains('item-remove')) {
-                    carts.splice(index, 1);
-                } else {
-                    return;
-                }
-
-                localStorage.setItem('carts', JSON.stringify(carts));
-                renderCart();
-            });
-
-            // Initial render
-            renderCart();
+            cartContainer.appendChild(itemElement);
         });
-    </script>
-</body>
+
+        updateTotals(calculateSubtotal());
+    }
+
+    // Calculate subtotal
+    function calculateSubtotal() {
+        return carts.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
+    }
+
+    // Update totals
+    function updateTotals(subtotal) {
+        const total = subtotal;
+        const totalKHR = (total * EXCHANGE_RATE).toLocaleString('en-US');
+
+        subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
+        totalElement.innerHTML = `
+            <span class="price-usd">$${total.toFixed(2)}</span>
+            <span class="price-khr">៛${totalKHR}</span>
+        `;
+    }
+
+    // Event delegation for cart interactions
+    cartContainer.addEventListener('click', function(e) {
+        const index = e.target.dataset.index;
+
+        if (e.target.classList.contains('minus')) {
+            if (carts[index].quantity > 1) {
+                carts[index].quantity--;
+            } else {
+                carts.splice(index, 1);
+            }
+        } else if (e.target.classList.contains('plus')) {
+            carts[index].quantity++;
+        } else if (e.target.classList.contains('item-remove')) {
+            carts.splice(index, 1);
+        } else {
+            return;
+        }
+
+        localStorage.setItem('carts', JSON.stringify(carts));
+        renderCart();
+    });
+
+    // Initial render
+    renderCart();
+});
+</script>
 {% endblock %}

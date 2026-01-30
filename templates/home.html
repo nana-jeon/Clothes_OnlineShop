@@ -2,255 +2,181 @@
 
 {% block content %}
 
-    <!-- Hero Section -->
-    <header>
-        <div class="container">
-            <nav>
-                <a class="logo">Romdoul Shop</a>
-                <ul class="nav-links">
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/product">Products</a></li>
-                    <li><a href="/about_us">About Us</a></li>
-                    <li><a href="/contact_us">Contact Us</a></li>
-                </ul>
-                <div class="mobile-menu">
-                    <i class="fas fa-bars"></i>
+<!-- Hero Section -->
+<header>
+    <div class="container">
+        <nav>
+            <a class="logo">Romdoul Shop</a>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/product">Products</a></li>
+                <li><a href="/about_us">About Us</a></li>
+                <li><a href="/contact_us">Contact Us</a></li>
+            </ul>
+            <div class="mobile-menu">
+                <i class="fas fa-bars"></i>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+
+    <!-- Hero Slider -->
+    <section class="hero-slider">
+        <div class="slider-container">
+            <div class="slider">
+
+                <div class="slide active">
+                    <img src="/static/images/cover 2.jpg">
+                    <div class="slide-content">
+                        <h2>Summer Sale!</h2>
+                        <p>Up to 50% off on selected items</p>
+                        <a href="/product" class="btn">Shop Now</a>
+                    </div>
                 </div>
-            </nav>
+
+                <div class="slide">
+                    <img src="/static/images/cover.jpg">
+                    <div class="slide-content">
+                        <h2>New Arrivals</h2>
+                        <p>Discover our latest products</p>
+                        <a href="/product" class="btn">Explore</a>
+                    </div>
+                </div>
+
+                <div class="slide">
+                    <img src="/static/images/cover1.jpg">
+                    <div class="slide-content">
+                        <h2>Free Shipping</h2>
+                        <p>On all orders over $50</p>
+                        <a href="/product" class="btn">Learn More</a>
+                    </div>
+                </div>
+
+            </div>
+
+            <button class="slider-btn prev-btn">&lt;</button>
+            <button class="slider-btn next-btn">&gt;</button>
+
+            <div class="slider-indicators">
+                <span class="indicator active"></span>
+                <span class="indicator"></span>
+                <span class="indicator"></span>
+            </div>
         </div>
-    </header>
+    </section>
 
-    <main class="container">
-        <!-- Hero Slider Section -->
-        <section class="hero-slider">
-            <div class="slider-container">
-                <div class="slider">
-                    <!-- Slide 1 -->
-                    <div class="slide active">
-                        <img src="/static/images/cover%202.jpg" alt="Summer Sale">
-                        <div class="slide-content">
-                            <h2>Summer Sale!</h2>
-                            <p>Up to 50% off on selected items</p>
-                            <a href="/product" class="btn">Shop Now</a>
-                        </div>
-                    </div>
+    <!-- Products -->
+    <section class="products">
+        <h3 class="section-title">Featured Products</h3>
 
-                    <!-- Slide 2 -->
-                    <div class="slide">
-                        <img src="/static/images/cover.jpg" >
-                        <div class="slide-content">
-                            <h2>New Arrivals</h2>
-                            <p>Discover our latest products</p>
-                            <a href="/product" class="btn">Explore</a>
-                        </div>
-                    </div>
+        <div class="product-grid">
+            {% for item in products %}
+            <div class="product-card">
 
-                    <!-- Slide 3 -->
-                    <div class="slide">
-                        <img src="/static/images/cover1.jpg" alt="Free Shipping">
-                        <div class="slide-content">
-                            <h2>Free Shipping</h2>
-                            <p>On all orders over $50</p>
-                            <a href="/product" class="btn">Learn More</a>
-                        </div>
-                    </div>
+                <div class="discount" data-category="{{ item.category_id }}">
+                    Category {{ item.category_id }}
                 </div>
 
-                <!-- Slider Controls -->
-                <button class="slider-btn prev-btn">&lt;</button>
-                <button class="slider-btn next-btn">&gt;</button>
+                {% if item.image %}
+                <img src="/static/images/product/{{ item.image }}"
+                     alt="{{ item.name }}"
+                     style="height: 200px; object-fit: contain;">
+                {% endif %}
 
-                <!-- Slider Indicators -->
-                <div class="slider-indicators">
-                    <span class="indicator active"></span>
-                    <span class="indicator"></span>
-                    <span class="indicator"></span>
+                <a href="/product_detail/{{ item.id }}" class="product-title">
+                    {{ item.name }}
+                </a>
+
+                <p>${{ "%.2f"|format(item.price|float) }}</p>
+
+                <input
+                    type="button"
+                    value="Add to Cart"
+                    class="btn-add-to-cart"
+                    id="add-to-cart-{{ item.id }}"
+                    data-id="{{ item.id }}"
+                    data-title="{{ item.name }}"
+                    data-price="{{ item.price }}"
+                    data-image="{{ item.image }}"
+                >
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- About -->
+    <section class="about-section">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2>About Romdoul Shop</h2>
+                    <p>
+                        We are committed to providing high-quality products with exceptional customer service.
+                        Our mission is to make shopping easy, enjoyable, and affordable for everyone.
+                    </p>
+                    <a href="/about_us" class="btn">Learn More</a>
+                </div>
+                <div class="about-image">
+                    <img src="https://via.placeholder.com/500x300">
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section class="products">
-            <h3 class="section-title">Featured Products</h3>
-            <div class="product-grid">
-                {% for item in products %}
-                <div class="product-card">
-                    <div class="discount" data-category="{{ item.get('category', '') }}">
-                        {{ item.get('category', '') }}
-                    </div>
-                    <img src="{{ item.get('image', '') }}"
-                         alt="{{ item.get('title', 'Product image') }}"
-                         style="height: 200px; object-fit: contain;"
-                         onerror="this.style.display='none'">
-                    <a href="/product_detail/{{ item.id }}" class="product-title">
-                        {{ item.get('title', 'Untitled Product') }}
-                    </a>
-                    <p>${{ "%.2f"|format(item.get('price', 0)|float) }}</p>
-                    <input
-                        type="button"
-                        value="Add to Cart"
-                        class="btn-add-to-cart"
-                        id="add-to-cart-{{ item.id }}"
-                        name="add-to-cart"
-                        data-id="{{ item.id }}"
-                        data-title="{{ item.get('title', '') }}"
-                        data-price="{{ item.get('price', 0) }}"
-                        data-image="{{ item.get('image', '') }}"
-                    >
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="container">
+            <h2>What Our Customers Say</h2>
+
+            <div class="testimonial-grid">
+                <div class="testimonial-card">
+                    <p>"Great products and fast shipping! Will definitely shop here again."</p>
+                    <strong>- Jane D.</strong>
                 </div>
-                {% endfor %}
-            </div>
-        </section>
 
-        <!-- About Section -->
-        <section class="about-section">
-            <div class="container">
-                <div class="about-content">
-                    <div class="about-text">
-                        <h2>About Romdoul Shop</h2>
-                        <p>We are committed to providing high-quality products with exceptional customer service. Our mission is to make shopping easy, enjoyable, and affordable for everyone.</p>
-                        <a href="/about_us" class="btn">Learn More</a>
-                    </div>
-                    <div class="about-image">
-                        <img src="https://via.placeholder.com/500x300" alt="About Romdoul Shop">
-                    </div>
+                <div class="testimonial-card">
+                    <p>"Excellent customer service. The team went above and beyond to help me."</p>
+                    <strong>- Michael S.</strong>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Testimonials -->
-        <section class="testimonials">
-            <div class="container">
-                <h2>What Our Customers Say</h2>
-                <div class="testimonial-grid">
-                    <div class="testimonial-card">
-                        <p>"Great products and fast shipping! Will definitely shop here again."</p>
-                        <div class="customer">
-                            <strong>- Jane D.</strong>
-                        </div>
-                    </div>
-                    <div class="testimonial-card">
-                        <p>"Excellent customer service. The team went above and beyond to help me."</p>
-                        <div class="customer">
-                            <strong>- Michael S.</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </main>
+</main>
 
 {% endblock %}
 
 {% block custom_script %}
 <script>
-    // Slider functionality
-    document.addEventListener('DOMContentLoaded', function() {
-        const slider = document.querySelector('.slider');
-        const slides = document.querySelectorAll('.slide');
-        const prevBtn = document.querySelector('.prev-btn');
-        const nextBtn = document.querySelector('.next-btn');
-        const indicators = document.querySelectorAll('.indicator');
-        let currentIndex = 0;
-        let slideInterval;
-        const slideDuration = 5000; // 5 seconds
+document.addEventListener('DOMContentLoaded', function () {
 
-        // Initialize slider
-        function initSlider() {
-            updateSlider();
-            startSlideShow();
-        }
+    let carts = JSON.parse(localStorage.getItem('carts')) || [];
 
-        // Update slider position
-        function updateSlider() {
-            slider.style.transform = `translateX(-${currentIndex * 100}%)`;
+    document.querySelectorAll('.btn-add-to-cart').forEach(button => {
+        button.addEventListener('click', function () {
 
-            // Update indicators
-            indicators.forEach((indicator, index) => {
-                indicator.classList.toggle('active', index === currentIndex);
-            });
-        }
+            const product = {
+                id: this.dataset.id,
+                title: this.dataset.title,
+                price: this.dataset.price,
+                image: this.dataset.image,
+                quantity: 1
+            };
 
-        // Go to next slide
-        function nextSlide() {
-            currentIndex = (currentIndex + 1) % slides.length;
-            updateSlider();
-        }
+            const index = carts.findIndex(item => item.id === product.id);
 
-        // Go to previous slide
-        function prevSlide() {
-            currentIndex = (currentIndex - 1 + slides.length) % slides.length;
-            updateSlider();
-        }
+            if (index >= 0) {
+                carts[index].quantity += 1;
+            } else {
+                carts.push(product);
+            }
 
-        // Start automatic slideshow
-        function startSlideShow() {
-            slideInterval = setInterval(nextSlide, slideDuration);
-        }
-
-        // Stop automatic slideshow
-        function stopSlideShow() {
-            clearInterval(slideInterval);
-        }
-
-        // Event listeners
-        nextBtn.addEventListener('click', () => {
-            stopSlideShow();
-            nextSlide();
-            startSlideShow();
-        });
-
-        prevBtn.addEventListener('click', () => {
-            stopSlideShow();
-            prevSlide();
-            startSlideShow();
-        });
-
-        // Indicator clicks
-        indicators.forEach((indicator, index) => {
-            indicator.addEventListener('click', () => {
-                stopSlideShow();
-                currentIndex = index;
-                updateSlider();
-                startSlideShow();
-            });
-        });
-
-        // Pause on hover
-        slider.addEventListener('mouseenter', stopSlideShow);
-        slider.addEventListener('mouseleave', startSlideShow);
-
-        // Initialize
-        initSlider();
-
-        // Cart functionality
-        // Initialize cart from localStorage
-        let carts = JSON.parse(localStorage.getItem('carts')) || [];
-
-        document.querySelectorAll('.btn-add-to-cart').forEach(button => {
-            button.addEventListener('click', function() {
-                const product = {
-                    id: this.getAttribute('data-id'),
-                    title: this.getAttribute('data-title'),
-                    price: this.getAttribute('data-price'),
-                    image: this.getAttribute('data-image'),
-                    quantity: 1
-                };
-
-                // Check if product exists in cart
-                const existingIndex = carts.findIndex(item => item.id === product.id);
-
-                if (existingIndex >= 0) {
-                    carts[existingIndex].quantity += 1;
-                } else {
-                    carts.push(product);
-                }
-
-                // Update localStorage
-                localStorage.setItem('carts', JSON.stringify(carts));
-                countCartItem()
-            });
+            localStorage.setItem('carts', JSON.stringify(carts));
         });
     });
+
+});
 </script>
 {% endblock %}

@@ -312,62 +312,38 @@
     </style>
         </head>
         <body>
-        <div class="container">
-            <div class="product-detail">
-                <div class="product-gallery">
-                    <img src="{{ item.image or 'https://via.placeholder.com/600x400?text=Premium+Headphones' }}"
-                         alt="{{ item.title }}" class="main-image">
-                    <div class="thumbnail-container">
-                        <!-- You can add more images here if available in your item data -->
-                        <img src="{{ item.image or 'https://via.placeholder.com/100x100?text=Front+View' }}"
-                             alt="Front View" class="thumbnail">
-                        <!-- Add more thumbnails as needed -->
+            <div class="container">
+                <div class="product-detail">
+                    <div class="product-gallery">
+                        <img src="{{ '/static/images/product/' + item.image if item.image else 'https://via.placeholder.com/600x400?text=Premium+Headphones' }}"
+                             alt="{{ item.name }}" class="main-image">
+                        <div class="thumbnail-container">
+                            <!-- Thumbnail -->
+                            <img src="{{ '/static/images/product/' + item.image if item.image else 'https://via.placeholder.com/100x100?text=Front+View' }}"
+                                 alt="Thumbnail" class="thumbnail">
+                        </div>
+                    </div>
+
+                    <div class="product-info">
+                        <h1 class="product-title">{{ item.name }}</h1>
+
+                        <div class="product-brand">
+                            Category: <span>{{ item.category_id }}</span>
+                        </div>
+
+                        <div class="price-container">
+                            <span class="current-price">${{ "%.2f"|format(item.price|float) }}</span>
+                        </div>
+
+                        <p class="product-description">{{ item.description }}</p>
+                        <p class="stock">Stock: {{ item.stock }}</p>
+
+                        <div class="action-buttons">
+                            <a href="/product" class="back-button">Back To Products</a>
+                        </div>
                     </div>
                 </div>
-
-            <div class="product-info">
-    <h1 class="product-title">{{ item.title }}</h1>
-
-    <div class="product-brand">Category: <span>{{ item.category }}</span></div>
-
-    <div class="rating">
-        <div class="stars">
-            {% for i in range(5) %}
-                {% if i < item.rating.rate|int %}
-                    ★
-                {% else %}
-                    ☆
-                {% endif %}
-            {% endfor %}
-        </div>
-        <a href="#" class="review-count">{{ item.rating.count }} Reviews</a>
-    </div>
-
-    <div class="price-container">
-        <span class="current-price">${{ "%.2f"|format(item.price) }}</span>
-    </div>
-
-    <p class="product-description">
-        {{ item.description }}
-    </p>
-
-    <div class="product-image">
-        <img src="{{ item.image }}" alt="{{ item.title }}" class="main-image">
-    </div>
-
-    <div class="action-buttons">
-        <button class="add-to-cart"
-                id="add-to-cart-{{ item.id }}"
-                data-id="{{ item.id }}"
-                data-title="{{ item.title }}"
-                data-price="{{ item.price }}"
-                data-image="{{ item.image }}">
-        </button>
-        <a href="/product" class="back-button">Back To Products</a>
-         </div>
-    </div>
             </div>
-
-        </div>
         </body>
+
         </html>

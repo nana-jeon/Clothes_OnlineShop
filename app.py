@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, json, jsonify
+from flask import Flask, render_template, request, json, jsonify, redirect, url_for
 from flask_mail import Mail, Message
 from telegram_bot_function import sendText
 from flask_sqlalchemy import SQLAlchemy
@@ -203,14 +203,14 @@ def error_500(error):
 # ======================================================================================================
 
 
-# @app.route('/sendMail')
-# def send_email():
-#     msg = Message('Invoice From Nana Shop', recipients=['sreylis534@gmail.com'])
-#     msg.body = 'This is a plain text email sent from Flask'
-#     message = render_template('invoice.html')
-#     msg.html = message
-#     mail.send(msg)
-#     return 'Email sent succesfully!'
+@app.route('/sendMail')
+def send_email():
+    msg = Message('Invoice From Nana Shop', recipients=['sreylis534@gmail.com'])
+    msg.body = 'This is a plain text email sent from Flask'
+    message = render_template('invoice.html')
+    msg.html = message
+    mail.send(msg)
+    return 'Email sent succesfully!'
 
 
 @app.get('/Scripts')
@@ -557,25 +557,24 @@ def process_checkout():
     html += table
     sendText(chat_id='@O_Romdoul', message=html)
 
-    # # ------------------- SEND EMAIL -------------------
-    # msg = Message('Invoice From Nana Shop', recipients=[email])
-    # msg.body = 'This is a plain text email sent from Flask'
-    # msg.html = render_template(
-    #     'invoice.html',
-    #     customer_name=customer.username,
-    #     customer_email=email,
-    #     customer_address=address,
-    #     customer_phone=phone,
-    #     items=cart_data,
-    #     total=f"${total:.2f}",
-    #     total_khr=f"{formatted_khr}"
-    # )
-    # mail.send(msg)
+    # ------------------- SEND EMAIL -------------------
+    msg = Message('Invoice From Nana Shop', recipients=[email])
+    msg.body = 'This is a plain text email sent from Flask'
+    msg.html = render_template(
+        'invoice.html',
+        customer_name=customer.username,
+        customer_email=email,
+        customer_address=address,
+        customer_phone=phone,
+        items=cart_data,
+        total=f"${total:.2f}",
+        total_khr=f"{formatted_khr}"
+    )
+    mail.send(msg)
 
-    return "Checkout successful!"
+    # return "Checkout successful!"
 
-
-
+    return redirect(url_for('successful'))
 
 
 if __name__ == '__main__':

@@ -47,6 +47,8 @@ def admin_orders():
 
 
 
+
+
 @app.get('/admin/order/<int:order_id>')
 def order_detail(order_id):
     from model import Order, OrderItem

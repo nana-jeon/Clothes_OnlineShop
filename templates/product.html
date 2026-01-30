@@ -1,42 +1,49 @@
 {% extends 'master.html' %}
 
 {% block content %}
-<body>
-    <header>
-        <div class="container">
-            <nav>
-                <a class="logo">Romdoul Shop</a>
-                <ul class="nav-links">
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/product">Products</a></li>
-                    <li><a href="/about_us">About Us</a></li>
-                    <li><a href="/contact_us">Contact Us</a></li>
-                </ul>
-                <div class="mobile-menu">
-                    <i class="fas fa-bars"></i>
-                </div>
-            </nav>
-        </div>
-    </header>
 
-    <main class="container">
+<header>
+    <div class="container">
+        <nav>
+            <a class="logo">Romdoul Shop</a>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/product">Products</a></li>
+                <li><a href="/about_us">About Us</a></li>
+                <li><a href="/contact_us">Contact Us</a></li>
+            </ul>
+            <div class="mobile-menu">
+                <i class="fas fa-bars"></i>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
     <section class="products">
-        <h3 class="section-title">Featured Products</h3>
+        <h3 class="section-title">All Products</h3>
+
         <div class="product-grid">
             {% for item in products %}
             <div class="product-card">
-                <div class="discount" data-category="{{ item.get('category', '') }}">
-                    {{ item.get('category', '') }}
+
+                <div class="discount" data-category="{{ item.category.name }}">
+                    Category {{ item.category.name }}
                 </div>
-                <img src="{{ item.get('image', '') }}"
-                     alt="{{ item.get('title', 'Product image') }}"
+
+                {% if item.image %}
+                <img src="/static/images/product/{{ item.image }}"
+                     alt="{{ item.name }}"
                      style="height: 200px; object-fit: contain;"
                      onerror="this.style.display='none'">
+                {% endif %}
+
                 <a href="/product_detail/{{ item.id }}" class="product-title">
-                  {{ item.get('title', 'Untitled Product') }}
+                    {{ item.name }}
                 </a>
 
-                <p>${{ "%.2f"|format(item.get('price', 0)|float) }}</p>
+                <p>${{ "%.2f"|format(item.price|float) }}</p>
+
                 <input
                     type="button"
                     value="Add to Cart"
@@ -44,36 +51,35 @@
                     id="add-to-cart-{{ item.id }}"
                     name="add-to-cart"
                     data-id="{{ item.id }}"
-                    data-title="{{ item.get('title', '') }}"
-                    data-price="{{ item.get('price', 0) }}"
-                    data-image="{{ item.get('image', '') }}"
+                    data-title="{{ item.name }}"
+                    data-price="{{ item.price }}"
+                    data-image="{{ item.image }}"
                 >
             </div>
             {% endfor %}
         </div>
     </section>
 </main>
-</body>
-
 
 {% endblock %}
 
 {% block custom_script %}
 <script>
-    // Initialize cart from localStorage
+document.addEventListener('DOMContentLoaded', function () {
+
     let carts = JSON.parse(localStorage.getItem('carts')) || [];
 
     document.querySelectorAll('.btn-add-to-cart').forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function () {
+
             const product = {
-                id: this.getAttribute('data-id'),
-                title: this.getAttribute('data-title'),
-                price: this.getAttribute('data-price'),
-                image: this.getAttribute('data-image'),
+                id: this.dataset.id,
+                title: this.dataset.title,
+                price: this.dataset.price,
+                image: this.dataset.image,
                 quantity: 1
             };
 
-            // Check if product exists in cart
             const existingIndex = carts.findIndex(item => item.id === product.id);
 
             if (existingIndex >= 0) {
@@ -82,10 +88,11 @@
                 carts.push(product);
             }
 
-            // Update localStorage
             localStorage.setItem('carts', JSON.stringify(carts));
-            countCartItem()
+            countCartItem();
         });
     });
+
+});
 </script>
 {% endblock %}

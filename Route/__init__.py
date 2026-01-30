@@ -5,6 +5,7 @@ from Route.Front.addcart import *
 from Route.Front.Contactus import *
 from Route.Front.ProductDetail import *
 from Route.Front.Checkout import *
+from Route.Front.Success import *
 
 
 # admin
@@ -29,6 +30,7 @@ from Route.api.customer import *
 from Route.api.invoice import *
 from Route.api.invoice_detail import *
 from Route.api.report import *
+
 
 
 
